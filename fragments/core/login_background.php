@@ -6,15 +6,19 @@
 
 // Prüfen ob wir uns im Winterzeitraum befinden (6. Dezember bis 24. Februar)
 $currentDate = new DateTime();
-$winterStart = new DateTime('December 6');
-$winterEnd = new DateTime('February 24');
+$currentMonth = (int)$currentDate->format('n');
+$currentDay = (int)$currentDate->format('j');
 
-// Stelle sicher, dass der Winterstart im gleichen Jahr oder Vorjahr liegt
-if ($currentDate < $winterStart) {
-    $winterStart->modify('-1 year');
-}
+// Winter ist aktiv wenn:
+// - Dezember (Monat 12) nach dem 6. Tag
+// - Januar (Monat 1) komplett
+// - Februar (Monat 2) bis einschließlich 24. Tag
+$isWinter = ($currentMonth === 12 && $currentDay >= 6) ||
+            ($currentMonth === 1) ||
+            ($currentMonth === 2 && $currentDay <= 24);
 
-$isWinter = $currentDate >= $winterStart && $currentDate <= $winterEnd;
+// Für Testzwecke auf true setzen
+$isWinter = true;
 
 // Prüfe ob es Tag oder Nacht ist (zwischen 18:00 und 06:00 = Nacht)
 $hour = (int)$currentDate->format('H');
@@ -60,9 +64,7 @@ for ($i = 1; $i <= 4; $i++) {
         "></div>
     <?php endfor; ?>
     
-    <?php if ($isWinter): ?>
         <div class="snowfall"></div>
-    <?php endif; ?>
     
     <div class="light-spot"></div>
     <div class="glow glow1"></div>
@@ -138,39 +140,55 @@ body {
     z-index: 1000;
 }
 
-.snowfall::before,
-.snowfall::after {
-    content: "";
-    position: absolute;
+.snowfall {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.snowfall::before, .snowfall::after {
+    content: '';
+    position: fixed;
+    top: -100vh;
+    left: 0;
+    width: 100vw;
+    height: 200vh;
     background-image: 
-        radial-gradient(4px 4px at 100px 50px, #fff, transparent),
-        radial-gradient(6px 6px at 200px 150px, #fff, transparent),
-        radial-gradient(3px 3px at 300px 250px, #fff, transparent),
-        radial-gradient(4px 4px at 400px 350px, #fff, transparent),
-        radial-gradient(6px 6px at 500px 100px, #fff, transparent),
-        radial-gradient(3px 3px at 50px 200px, #fff, transparent),
-        radial-gradient(4px 4px at 150px 300px, #fff, transparent),
-        radial-gradient(6px 6px at 250px 400px, #fff, transparent),
-        radial-gradient(3px 3px at 350px 500px, #fff, transparent);
-    background-size: 650px 650px;
-    animation: snow 3s linear infinite;
+        radial-gradient(3px 3px at 20% 30%, rgba(255, 255, 255, 0.8) 50%, transparent),
+        radial-gradient(2px 2px at 40% 70%, rgba(255, 255, 255, 0.6) 50%, transparent),
+        radial-gradient(4px 4px at 60% 40%, rgba(255, 255, 255, 0.9) 50%, transparent),
+        radial-gradient(2px 2px at 80% 60%, rgba(255, 255, 255, 0.7) 50%, transparent),
+        radial-gradient(3px 3px at 30% 20%, rgba(255, 255, 255, 0.8) 50%, transparent),
+        radial-gradient(2px 2px at 70% 50%, rgba(255, 255, 255, 0.6) 50%, transparent),
+        radial-gradient(4px 4px at 90% 80%, rgba(255, 255, 255, 0.9) 50%, transparent);
+    animation: snowfall 10s linear infinite;
+    will-change: transform;
+    background-size: 100% 100%;
 }
 
 .snowfall::after {
-    margin-left: -250px;
-    opacity: 0.5;
-    animation: snow 6s linear infinite;
-    animation-delay: -3s;
+    background-image: 
+        radial-gradient(3px 3px at 10% 40%, rgba(255, 255, 255, 0.8) 50%, transparent),
+        radial-gradient(2px 2px at 30% 80%, rgba(255, 255, 255, 0.6) 50%, transparent),
+        radial-gradient(4px 4px at 50% 30%, rgba(255, 255, 255, 0.9) 50%, transparent),
+        radial-gradient(2px 2px at 70% 90%, rgba(255, 255, 255, 0.7) 50%, transparent),
+        radial-gradient(3px 3px at 20% 10%, rgba(255, 255, 255, 0.8) 50%, transparent),
+        radial-gradient(2px 2px at 60% 60%, rgba(255, 255, 255, 0.6) 50%, transparent),
+        radial-gradient(4px 4px at 80% 70%, rgba(255, 255, 255, 0.9) 50%, transparent);
+    animation: snowfall 15s linear infinite;
+    animation-delay: -5s;
 }
 
-@keyframes snow {
+@keyframes snowfall {
     0% {
-        transform: translate3d(0, -650px, 0);
+        transform: translateY(0) rotate(0deg);
     }
     100% {
-        transform: translate3d(0, 650px, 0);
+        transform: translateY(100vh) rotate(360deg);
     }
 }
 
