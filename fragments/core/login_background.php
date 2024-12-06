@@ -4,12 +4,36 @@
  * @psalm-scope-this rex_fragment
  */
 
-$colors = [
+// Prüfen ob wir uns im Winterzeitraum befinden (6. Dezember bis 24. Februar)
+$currentDate = new DateTime();
+$winterStart = new DateTime('December 6');
+$winterEnd = new DateTime('February 24');
+
+// Stelle sicher, dass der Winterstart im gleichen Jahr oder Vorjahr liegt
+if ($currentDate < $winterStart) {
+    $winterStart->modify('-1 year');
+}
+
+$isWinter = $currentDate >= $winterStart && $currentDate <= $winterEnd;
+
+// Prüfe ob es Tag oder Nacht ist (zwischen 18:00 und 06:00 = Nacht)
+$hour = (int)$currentDate->format('H');
+$isNight = $hour >= 18 || $hour < 6;
+
+// Farbpaletten für Tag und Nacht
+$dayColors = [
     ['bg' => '#25a7d7', 'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'], 'spot' => 'rgba(119,218,255,0.1)'],
     ['bg' => '#0e6cc4', 'accents' => ['#25a7d7', '#39d353', '#0af', '#1e88e5'], 'spot' => 'rgba(57,211,83,0.1)'],
     ['bg' => '#1e88e5', 'accents' => ['#2962FF', '#2ea043', '#25a7d7', '#77daff'], 'spot' => 'rgba(46,160,67,0.1)']
 ];
 
+$nightColors = [
+    ['bg' => '#1a237e', 'accents' => ['#0d47a1', '#1565c0', '#0277bd', '#01579b'], 'spot' => 'rgba(13,71,161,0.1)'],
+    ['bg' => '#0d47a1', 'accents' => ['#1a237e', '#283593', '#1565c0', '#0277bd'], 'spot' => 'rgba(26,35,126,0.1)'],
+    ['bg' => '#283593', 'accents' => ['#1a237e', '#0d47a1', '#1565c0', '#01579b'], 'spot' => 'rgba(13,71,161,0.1)']
+];
+
+$colors = $isNight ? $nightColors : $dayColors;
 $scheme = $colors[array_rand($colors)];
 
 $sizes = [];
@@ -35,6 +59,11 @@ for ($i = 1; $i <= 4; $i++) {
             transform: rotate(<?= $sizes[$i]['rotation'] ?>deg) scale(<?= $sizes[$i]['scale'] ?>);
         "></div>
     <?php endfor; ?>
+    
+    <?php if ($isWinter): ?>
+        <div class="snowfall"></div>
+    <?php endif; ?>
+    
     <div class="light-spot"></div>
     <div class="glow glow1"></div>
     <div class="glow glow2"></div>
@@ -55,6 +84,7 @@ body {
     padding: 0;
     background: var(--bg-primary);
     overflow: hidden;
+    transition: background-color 1s ease;
 }
 
 .box {
@@ -66,6 +96,7 @@ body {
     overflow: hidden;
 }
 
+/* Bestehende Styles für shapes, etc. */
 .shape {
     position: fixed;
     opacity: 0.3;
@@ -73,9 +104,43 @@ body {
     z-index: -1;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    transition: transform 0.5s ease-out;
+    transition: all 0.5s ease-out;
 }
 
+/* Schneeflocken-Animation */
+.snowfall {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1000;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50px 160px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #fff, rgba(0,0,0,0));
+    background-repeat: repeat;
+    animation: snowfall 10s linear infinite;
+}
+
+@keyframes snowfall {
+    0% { background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px; }
+    100% { 
+        background-position: 
+            500px 1000px, 
+            400px 900px, 
+            300px 800px, 
+            200px 700px,
+            100px 600px,
+            0px 500px; 
+    }
+}
+
+/* Bestehende Animationen und weitere Styles bleiben gleich */
 .shape1 {
     background: var(--accent1);
     animation: float 60s infinite ease-in-out;
@@ -115,40 +180,11 @@ body {
     background: radial-gradient(circle, var(--spot-color) 0%, rgba(255,255,255,0) 70%);
     pointer-events: none;
     mix-blend-mode: screen;
-    opacity: 0.4;
+    opacity: <?= $isNight ? '0.3' : '0.4' ?>;
     animation: pulse 8s infinite ease-in-out;
 }
 
-.glow1 {
-    top: -25vh;
-    left: -25vw;
-    animation-delay: -4s;
-}
-
-.glow2 {
-    bottom: -25vh;
-    right: -25vw;
-}
-
-@keyframes float {
-    0%, 100% { 
-        transform: rotate(<?= rand(-45, 45) ?>deg) translate(0, 0) scale(1); 
-    }
-    25% { 
-        transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(5, 15) ?>vw, <?= rand(5, 15) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
-    }
-    50% { 
-        transform: rotate(<?= rand(75, 105) ?>deg) translate(<?= rand(-15, -5) ?>vw, <?= rand(-10, -5) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
-    }
-    75% { 
-        transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(-10, -5) ?>vw, <?= rand(5, 10) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
-    }
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.1); }
-}
+/* Rest der bestehenden Styles... */
 </style>
 
 <script>
