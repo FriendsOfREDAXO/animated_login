@@ -3,200 +3,177 @@
  * @var rex_fragment $this
  * @psalm-scope-this rex_fragment
  */
+
+$colors = [
+    ['bg' => '#25a7d7', 'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'], 'spot' => 'rgba(119,218,255,0.1)'],
+    ['bg' => '#0e6cc4', 'accents' => ['#25a7d7', '#39d353', '#0af', '#1e88e5'], 'spot' => 'rgba(57,211,83,0.1)'],
+    ['bg' => '#1e88e5', 'accents' => ['#2962FF', '#2ea043', '#25a7d7', '#77daff'], 'spot' => 'rgba(46,160,67,0.1)']
+];
+
+$scheme = $colors[array_rand($colors)];
+
+$sizes = [];
+for ($i = 1; $i <= 4; $i++) {
+    $sizes[] = [
+        'width' => rand(80, 120) . 'vw',
+        'height' => rand(80, 120) . 'vh',
+        'top' => rand(-20, 0) . 'vh',
+        'left' => rand(-20, 0) . 'vw',
+        'rotation' => rand(-360, 360),
+        'scale' => (rand(80, 120) / 100)
+    ];
+}
 ?>
 
-<div class='box rex-background'>
-  <div class='wave -one'></div>
-  <div class='wave -two'></div>
-  <div class='wave -three'></div>
+<div class="box rex-background">
+    <?php for ($i = 0; $i < 4; $i++): ?>
+        <div class="shape shape<?= ($i + 1) ?>" style="
+            width: <?= $sizes[$i]['width'] ?>;
+            height: <?= $sizes[$i]['height'] ?>;
+            top: <?= $sizes[$i]['top'] ?>;
+            left: <?= $sizes[$i]['left'] ?>;
+            transform: rotate(<?= $sizes[$i]['rotation'] ?>deg) scale(<?= $sizes[$i]['scale'] ?>);
+        "></div>
+    <?php endfor; ?>
+    <div class="light-spot"></div>
+    <div class="glow glow1"></div>
+    <div class="glow glow2"></div>
 </div>
 
 <style>
 :root {
-  --background-color: #0e6cc4;
-  --wave-one-color: #0af;
-  --wave-two-color: black;
-  --wave-three-color: #77daff;
-  --loading-background-start: #25a7d7;
-  --loading-background-end: #25a7d7; /* Hier kannst du auch #2962FF verwenden, wenn du das lineare Gradient wiederherstellen möchtest */
-  --panel-background-color: rgba(50, 64, 80, 0.57);
-  --panel-text-color: #dfe3e9;
+    --bg-primary: <?= $scheme['bg'] ?>;
+    --accent1: <?= $scheme['accents'][0] ?>;
+    --accent2: <?= $scheme['accents'][1] ?>;
+    --accent3: <?= $scheme['accents'][2] ?>;
+    --accent4: <?= $scheme['accents'][3] ?>;
+    --spot-color: <?= $scheme['spot'] ?>;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--background-color);
-  overflow-x: hidden;
-  overflow-y: hidden;
+    margin: 0;
+    padding: 0;
+    background: var(--bg-primary);
+    overflow: hidden;
 }
-
-/*waves****************************/
 
 .box {
-  position: fixed;
-  top: 0;
-  transform: rotate(5deg);
-  left: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
-.wave {
-  position: fixed;
-  top: 0;
-  left: 0;
-  opacity: .4;
-  position: absolute;
-  top: 3%;
-  left: 10%;
-  background: var(--wave-one-color);
-  width: 2000px;
-  height: 1400px;
-  margin-left: 150px;
-  margin-top: -250px;
-  transform-origin: 10% 58%;
-  border-radius: 66%;
-  animation: drift 40s infinite linear;
+.shape {
+    position: fixed;
+    opacity: 0.3;
+    transform-origin: center;
+    z-index: -1;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: transform 0.5s ease-out;
 }
 
-.wave.-three {
-  animation: drift 30s infinite linear;
-  position: fixed;
-  background-color: var(--wave-three-color);
+.shape1 {
+    background: var(--accent1);
+    animation: float 60s infinite ease-in-out;
 }
 
-.wave.-two {
-  animation: drift 22s infinite linear;
-  opacity: .1;
-  background: var(--wave-two-color);
-  position: fixed;
+.shape2 {
+    background: var(--accent2);
+    animation: float 75s infinite ease-in-out reverse;
 }
 
-.box:after {
-  content: '';
-  display: block;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 11;
-  transform: translate3d(0, 0, 0);
+.shape3 {
+    background: var(--accent3);
+    animation: float 90s infinite ease-in-out;
+    animation-delay: -30s;
 }
 
-@keyframes drift {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.shape4 {
+    background: var(--accent4);
+    animation: float 85s infinite ease-in-out reverse;
+    animation-delay: -45s;
 }
 
-/*LOADING SPACE*/
-
-.contain {
-  animation-delay: 8s;
-  z-index: 1000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-flow: row nowrap;
-  flex-flow: row nowrap;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  background: var(--loading-background-start);
-  background: -webkit-linear-gradient(var(--loading-background-start), var(--loading-background-end));
-  background: linear-gradient(var(--loading-background-start), var(--loading-background-end));
+.light-spot {
+    position: fixed;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, var(--spot-color) 50%, rgba(255,255,255,0) 70%);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    z-index: 1;
 }
 
-.icon {
-  width: 100px;
-  height: 100px;
-  margin: 0 5px;
+.glow {
+    position: fixed;
+    width: 150vw;
+    height: 150vh;
+    background: radial-gradient(circle, var(--spot-color) 0%, rgba(255,255,255,0) 70%);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.4;
+    animation: pulse 8s infinite ease-in-out;
 }
 
-#rex-page-login .panel-default {
-  background-color: var(--panel-background-color);
-  border: 0;
-  color: var(--panel-text-color);
-  border-radius: 10px;
+.glow1 {
+    top: -25vh;
+    left: -25vw;
+    animation-delay: -4s;
 }
 
-/*Animation*/
-.icon:nth-child(2) img {
-  -webkit-animation-delay: 1.5s;
-  animation-delay: 2.4s;
-}
-.icon:nth-child(3) img {
-  -webkit-animation-delay: 1.6s;
-  animation-delay: 3.2s;
-}
-.icon:nth-child(4) img {
-  -webkit-animation-delay: 1.8s;
-  animation-delay: 5.4s;
+.glow2 {
+    bottom: -25vh;
+    right: -25vw;
 }
 
-.icon img {
-  -webkit-animation: anim 14s ease infinite;
-  animation: anim 14s ease infinite;
-  -webkit-transform: scale(0, 0) rotateZ(180deg);
-  transform: scale(0, 0) rotateZ(180deg);
+@keyframes float {
+    0%, 100% { 
+        transform: rotate(<?= rand(-45, 45) ?>deg) translate(0, 0) scale(1); 
+    }
+    25% { 
+        transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(5, 15) ?>vw, <?= rand(5, 15) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
+    50% { 
+        transform: rotate(<?= rand(75, 105) ?>deg) translate(<?= rand(-15, -5) ?>vw, <?= rand(-10, -5) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
+    75% { 
+        transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(-10, -5) ?>vw, <?= rand(5, 10) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
 }
 
-@-webkit-keyframes anim {
-  0% {
-    -webkit-transform: scale(0, 0) rotateZ(-90deg);
-    transform: scale(0, 0) rotateZ(-90deg);
-    opacity: 0;
-  }
-  30% {
-    -webkit-transform: scale(1, 1) rotateZ(0deg);
-    transform: scale(1, 1) rotateZ(0deg);
-    opacity: 1;
-  }
-  50% {
-    -webkit-transform: scale(1, 1) rotateZ(0deg);
-    transform: scale(1, 1) rotateZ(0deg);
-    opacity: 1;
-  }
-  80% {
-    -webkit-transform: scale(0, 0) rotateZ(90deg);
-    transform: scale(0, 0) rotateZ(90deg);
-    opacity: 0;
-  }
-}
-
-@keyframes anim {
-  0% {
-    -webkit-transform: scale(0, 0) rotateZ(-90deg);
-    transform: scale(0, 0) rotateZ(-90deg);
-    opacity: 0;
-  }
-  30% {
-    -webkit-transform: scale(1, 1) rotateZ(0deg);
-    transform: scale(1, 1) rotateZ(0deg);
-    opacity: 1;
-  }
-  50% {
-    -webkit-transform: scale(1, 1) rotateZ(0deg);
-    transform: scale(1, 1) rotateZ(0deg);
-    opacity: 1;
-  }
-  80% {
-    -webkit-transform: scale(0, 0) rotateZ(90deg);
-    transform: scale(0, 0) rotateZ(90deg);
-    opacity: 0;
-  }
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const spot = document.querySelector('.light-spot');
+    let mouseX = 0;
+    let mouseY = 0;
+    let currentX = 0;
+    let currentY = 0;
+
+    const animate = () => {
+        currentX += (mouseX - currentX) * 0.05;
+        currentY += (mouseY - currentY) * 0.05;
+        spot.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%, -50%)`;
+        requestAnimationFrame(animate);
+    };
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    animate();
+});
+</script>
 
 <footer class="rex-global-footer">
   <nav class="rex-nav-footer">
