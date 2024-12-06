@@ -292,20 +292,38 @@ body {
 }
 
 /* Akkumulierter Schnee am Boden */
-.snow-ground {
+.snow-pile {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 30px;
-    background: linear-gradient(180deg, 
-        transparent 0%,
-        var(--snow-color) 30%,
-        var(--snow-color) 100%
-    );
-    opacity: 0.8;
-    transform-origin: bottom;
-    animation: snow-accumulate 10s ease-out forwards;
+    height: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.landed-snowflake {
+    position: absolute;
+    background: var(--snow-color);
+    border-radius: 50%;
+    box-shadow: 0 2px 5px var(--snow-shadow);
+    transform-origin: center bottom;
+    animation: settle 0.5s ease-out forwards;
+}
+
+@keyframes settle {
+    0% {
+        transform: scale(1) translateY(-10px);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.2) translateY(2px);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Lichteffekte */
