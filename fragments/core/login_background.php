@@ -5,31 +5,36 @@
  */
 
 $colors = [
-    [
-        'bg' => '#25a7d7',
-        'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'],
-        'spot' => 'rgba(119,218,255,0.1)'
-    ],
-    [
-        'bg' => '#0e6cc4',
-        'accents' => ['#25a7d7', '#39d353', '#0af', '#1e88e5'],
-        'spot' => 'rgba(57,211,83,0.1)'
-    ],
-    [
-        'bg' => '#1e88e5',
-        'accents' => ['#2962FF', '#2ea043', '#25a7d7', '#77daff'],
-        'spot' => 'rgba(46,160,67,0.1)'
-    ]
+    ['bg' => '#25a7d7', 'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'], 'spot' => 'rgba(119,218,255,0.1)'],
+    ['bg' => '#0e6cc4', 'accents' => ['#25a7d7', '#39d353', '#0af', '#1e88e5'], 'spot' => 'rgba(57,211,83,0.1)'],
+    ['bg' => '#1e88e5', 'accents' => ['#2962FF', '#2ea043', '#25a7d7', '#77daff'], 'spot' => 'rgba(46,160,67,0.1)']
 ];
 
 $scheme = $colors[array_rand($colors)];
+
+$sizes = [];
+for ($i = 1; $i <= 4; $i++) {
+    $sizes[] = [
+        'width' => rand(80, 120) . 'vw',
+        'height' => rand(80, 120) . 'vh',
+        'top' => rand(-20, 0) . 'vh',
+        'left' => rand(-20, 0) . 'vw',
+        'rotation' => rand(-360, 360),
+        'scale' => (rand(80, 120) / 100)
+    ];
+}
 ?>
 
 <div class="box rex-background">
-    <div class="shape shape1"></div>
-    <div class="shape shape2"></div>
-    <div class="shape shape3"></div>
-    <div class="shape shape4"></div>
+    <?php for ($i = 0; $i < 4; $i++): ?>
+        <div class="shape shape<?= ($i + 1) ?>" style="
+            width: <?= $sizes[$i]['width'] ?>;
+            height: <?= $sizes[$i]['height'] ?>;
+            top: <?= $sizes[$i]['top'] ?>;
+            left: <?= $sizes[$i]['left'] ?>;
+            transform: rotate(<?= $sizes[$i]['rotation'] ?>deg) scale(<?= $sizes[$i]['scale'] ?>);
+        "></div>
+    <?php endfor; ?>
     <div class="light-spot"></div>
     <div class="glow glow1"></div>
     <div class="glow glow2"></div>
@@ -63,15 +68,12 @@ body {
 
 .shape {
     position: fixed;
-    width: 100vw;
-    height: 100vh;
     opacity: 0.3;
-    top: 0;
-    left: 0;
     transform-origin: center;
     z-index: -1;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    transition: transform 0.5s ease-out;
 }
 
 .shape1 {
@@ -129,10 +131,18 @@ body {
 }
 
 @keyframes float {
-    0%, 100% { transform: rotate(0deg) translate(0, 0); }
-    25% { transform: rotate(45deg) translate(10vw, 10vh); }
-    50% { transform: rotate(90deg) translate(-10vw, -5vh); }
-    75% { transform: rotate(45deg) translate(-5vw, 8vh); }
+    0%, 100% { 
+        transform: rotate(<?= rand(-45, 45) ?>deg) translate(0, 0) scale(1); 
+    }
+    25% { 
+        transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(5, 15) ?>vw, <?= rand(5, 15) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
+    50% { 
+        transform: rotate(<?= rand(75, 105) ?>deg) translate(<?= rand(-15, -5) ?>vw, <?= rand(-10, -5) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
+    75% { 
+        transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(-10, -5) ?>vw, <?= rand(5, 10) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
 }
 
 @keyframes pulse {
