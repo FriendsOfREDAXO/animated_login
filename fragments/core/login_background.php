@@ -1,108 +1,4 @@
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Spot-Animation
-    const spot = document.querySelector('.light-spot');
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let currentX = mouseX;
-    let currentY = mouseY;
-
-    // Schneefall-System
-    if (document.querySelector('.snow-container')) {
-        const snowContainer = document.querySelector('.snow-container');
-        const landedSnowContainer = document.createElement('div');
-        landedSnowContainer.className = 'landed-snow-container';
-        snowContainer.appendChild(landedSnowContainer);
-
-        const SEGMENT_COUNT = 50;
-        const segments = new Array(SEGMENT_COUNT).fill(0);
-        const MAX_SNOW_HEIGHT = 80;
-        let totalSnowflakes = 0;
-
-        function createLandedSnowflake(x, size) {
-            const snowflake = document.createElement('div');
-            snowflake.className = 'landed-snowflake';
-            const segmentIndex = Math.floor((x / window.innerWidth) * SEGMENT_COUNT);
-            
-            if (segments[segmentIndex] < MAX_SNOW_HEIGHT) {
-                const xPos = x;
-                const yPos = segments[segmentIndex];
-                
-                snowflake.style.cssText = `
-                    left: ${xPos}px;
-                    bottom: ${yPos}px;
-                    width: ${size}px;
-                    height: ${size}px;
-                    z-index: ${Math.floor(yPos)};
-                `;
-                
-                landedSnowContainer.appendChild(snowflake);
-                segments[segmentIndex] += size * 0.5;
-                totalSnowflakes++;
-
-                // Automatisches Abrutschen bei zu viel Schnee
-                if (segments[segmentIndex] > MAX_SNOW_HEIGHT * 0.8) {
-                    const diff = segments[segmentIndex] - (MAX_SNOW_HEIGHT * 0.7);
-                    // Verteile überschüssigen Schnee auf Nachbarsegmente
-                    if (segmentIndex > 0) {
-                        segments[segmentIndex - 1] += diff * 0.3;
-                    }
-                    if (segmentIndex < SEGMENT_COUNT - 1) {
-                        segments[segmentIndex + 1] += diff * 0.3;
-                    }
-                    segments[segmentIndex] = MAX_SNOW_HEIGHT * 0.7;
-                }
-            }
-        }
-
-        // Schneeflocken beobachten
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting && entry.boundingClientRect.bottom > window.innerHeight - MAX_SNOW_HEIGHT) {
-                    const snowflake = entry.target;
-                    const rect = snowflake.getBoundingClientRect();
-                    const size = parseFloat(snowflake.style.width);
-                    
-                    // Erstelle gelandete Schneeflocke
-                    createLandedSnowflake(rect.left, size);
-                    
-                    // Setze fallende Schneeflocke zurück
-                    snowflake.style.left = Math.random() * 100 + '%';
-                    snowflake.style.top = '-5vh';
-                }
-            });
-        }, {
-            threshold: 0,
-            rootMargin: '0px 0px -50px 0px'
-        });
-
-        // Beobachte alle Schneeflocken
-        document.querySelectorAll('.snowflake').forEach(snowflake => {
-            if (!snowflake.isObserved) {
-                observer.observe(snowflake);
-                snowflake.isObserved = true;
-            }
-        });
-    }
-
-    // Spot animation
-    function animate() {
-        currentX += (mouseX - currentX) * 0.05;
-        currentY += (mouseY - currentY) * 0.05;
-        if (spot) {
-            spot.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%, -50%)`;
-        }
-        requestAnimationFrame(animate);
-    }
-
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-
-    animate();
-});
-</script><?php
+<?php
 /**
  * @var rex_fragment $this
  * @psalm-scope-this rex_fragment
@@ -396,12 +292,12 @@ body {
 }
 
 /* Akkumulierter Schnee am Boden */
-.landed-snow-container {
+.snow-pile {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100px;
+    height: 0;
     pointer-events: none;
     z-index: 3;
 }
@@ -411,18 +307,18 @@ body {
     background: var(--snow-color);
     border-radius: 50%;
     box-shadow: 0 2px 5px var(--snow-shadow);
-    animation: snowLanding 0.5s ease-out;
-    pointer-events: none;
+    transform-origin: center bottom;
+    animation: settle 0.5s ease-out forwards;
 }
 
-@keyframes snowLanding {
+@keyframes settle {
     0% {
-        transform: scale(0.5) translateY(-10px);
-        opacity: 0.5;
+        transform: scale(1) translateY(-10px);
+        opacity: 0.8;
     }
     50% {
         transform: scale(1.2) translateY(2px);
-        opacity: 0.8;
+        opacity: 0.9;
     }
     100% {
         transform: scale(1) translateY(0);
