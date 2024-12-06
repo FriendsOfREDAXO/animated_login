@@ -7,15 +7,18 @@
 $colors = [
     [
         'bg' => '#25a7d7',
-        'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF']
+        'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'],
+        'spot' => 'rgba(119,218,255,0.1)'
     ],
     [
         'bg' => '#0e6cc4',
-        'accents' => ['#25a7d7', '#77daff', '#0af', '#1e88e5']
+        'accents' => ['#25a7d7', '#39d353', '#0af', '#1e88e5'],
+        'spot' => 'rgba(57,211,83,0.1)'
     ],
     [
         'bg' => '#1e88e5',
-        'accents' => ['#2962FF', '#0e6cc4', '#25a7d7', '#77daff']
+        'accents' => ['#2962FF', '#2ea043', '#25a7d7', '#77daff'],
+        'spot' => 'rgba(46,160,67,0.1)'
     ]
 ];
 
@@ -28,6 +31,8 @@ $scheme = $colors[array_rand($colors)];
     <div class="shape shape3"></div>
     <div class="shape shape4"></div>
     <div class="light-spot"></div>
+    <div class="glow glow1"></div>
+    <div class="glow glow2"></div>
 </div>
 
 <style>
@@ -37,6 +42,7 @@ $scheme = $colors[array_rand($colors)];
     --accent2: <?= $scheme['accents'][1] ?>;
     --accent3: <?= $scheme['accents'][2] ?>;
     --accent4: <?= $scheme['accents'][3] ?>;
+    --spot-color: <?= $scheme['spot'] ?>;
 }
 
 body {
@@ -70,41 +76,68 @@ body {
 
 .shape1 {
     background: var(--accent1);
-    animation: float 30s infinite ease-in-out;
+    animation: float 60s infinite ease-in-out;
 }
 
 .shape2 {
     background: var(--accent2);
-    animation: float 35s infinite ease-in-out reverse;
+    animation: float 75s infinite ease-in-out reverse;
 }
 
 .shape3 {
     background: var(--accent3);
-    animation: float 40s infinite ease-in-out;
-    animation-delay: -10s;
+    animation: float 90s infinite ease-in-out;
+    animation-delay: -30s;
 }
 
 .shape4 {
     background: var(--accent4);
-    animation: float 45s infinite ease-in-out reverse;
-    animation-delay: -20s;
+    animation: float 85s infinite ease-in-out reverse;
+    animation-delay: -45s;
 }
 
 .light-spot {
     position: fixed;
     width: 800px;
     height: 800px;
-    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(119,218,255,0.1) 50%, rgba(255,255,255,0) 70%);
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, var(--spot-color) 50%, rgba(255,255,255,0) 70%);
     pointer-events: none;
     mix-blend-mode: screen;
     z-index: 1;
 }
 
+.glow {
+    position: fixed;
+    width: 150vw;
+    height: 150vh;
+    background: radial-gradient(circle, var(--spot-color) 0%, rgba(255,255,255,0) 70%);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.4;
+    animation: pulse 8s infinite ease-in-out;
+}
+
+.glow1 {
+    top: -25vh;
+    left: -25vw;
+    animation-delay: -4s;
+}
+
+.glow2 {
+    bottom: -25vh;
+    right: -25vw;
+}
+
 @keyframes float {
     0%, 100% { transform: rotate(0deg) translate(0, 0); }
-    25% { transform: rotate(90deg) translate(20vw, 20vh); }
-    50% { transform: rotate(180deg) translate(-20vw, -10vh); }
-    75% { transform: rotate(270deg) translate(-10vw, 15vh); }
+    25% { transform: rotate(45deg) translate(10vw, 10vh); }
+    50% { transform: rotate(90deg) translate(-10vw, -5vh); }
+    75% { transform: rotate(45deg) translate(-5vw, 8vh); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
 }
 </style>
 
@@ -117,8 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentY = 0;
 
     const animate = () => {
-        currentX += (mouseX - currentX) * 0.1;
-        currentY += (mouseY - currentY) * 0.1;
+        currentX += (mouseX - currentX) * 0.05;
+        currentY += (mouseY - currentY) * 0.05;
         spot.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%, -50%)`;
         requestAnimationFrame(animate);
     };
