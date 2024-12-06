@@ -10,24 +10,52 @@ class TimeBasedTheme {
     
     private $seasons = [
         'winter' => [[12,1,2], [
-            ['bg' => '#1a3c64', 'accents' => ['#2f5d8c', '#4682b4', '#b0c4de', '#e3f2fd'], 'spot' => 'rgba(224,255,255,0.2)'],
-            ['bg' => '#2B4570', 'accents' => ['#3E6396', '#5A8AC6', '#7AA2D4', '#A1C6E7'], 'spot' => 'rgba(161,198,231,0.2)'],
-            ['bg' => '#1F3F66', 'accents' => ['#2C5C94', '#4378B4', '#6A9AD1', '#8FB8E3'], 'spot' => 'rgba(143,184,227,0.2)']
+            'day' => [
+                ['bg' => '#1a3c64', 'accents' => ['#2f5d8c', '#4682b4', '#b0c4de', '#e3f2fd'], 'spot' => 'rgba(224,255,255,0.2)'],
+                ['bg' => '#2B4570', 'accents' => ['#3E6396', '#5A8AC6', '#7AA2D4', '#A1C6E7'], 'spot' => 'rgba(161,198,231,0.2)'],
+                ['bg' => '#1F3F66', 'accents' => ['#2C5C94', '#4378B4', '#6A9AD1', '#8FB8E3'], 'spot' => 'rgba(143,184,227,0.2)']
+            ],
+            'night' => [
+                ['bg' => '#0a1a2f', 'accents' => ['#142d44', '#1e4059', '#2c5272', '#3a678c'], 'spot' => 'rgba(58,103,140,0.15)'],
+                ['bg' => '#0d1f38', 'accents' => ['#17324d', '#224662', '#305b7a', '#3e7093'], 'spot' => 'rgba(62,112,147,0.15)'],
+                ['bg' => '#081526', 'accents' => ['#11283f', '#1b3b55', '#284e6c', '#356283'], 'spot' => 'rgba(53,98,131,0.15)']
+            ]
         ]],
         'spring' => [[3,4,5], [
-            ['bg' => '#2d8a6d', 'accents' => ['#43c59e', '#3dd8a8', '#98ecb3', '#d1ffe3'], 'spot' => 'rgba(209,255,227,0.2)'],
-            ['bg' => '#3B7A59', 'accents' => ['#4FAB7B', '#65C693', '#8CE0B1', '#B3F5CF'], 'spot' => 'rgba(179,245,207,0.2)'],
-            ['bg' => '#256B4F', 'accents' => ['#368C6A', '#4CB389', '#71D1A7', '#96E8C5'], 'spot' => 'rgba(150,232,197,0.2)']
+            'day' => [
+                ['bg' => '#2d8a6d', 'accents' => ['#43c59e', '#3dd8a8', '#98ecb3', '#d1ffe3'], 'spot' => 'rgba(209,255,227,0.2)'],
+                ['bg' => '#3B7A59', 'accents' => ['#4FAB7B', '#65C693', '#8CE0B1', '#B3F5CF'], 'spot' => 'rgba(179,245,207,0.2)'],
+                ['bg' => '#256B4F', 'accents' => ['#368C6A', '#4CB389', '#71D1A7', '#96E8C5'], 'spot' => 'rgba(150,232,197,0.2)']
+            ],
+            'night' => [
+                ['bg' => '#1a4d3d', 'accents' => ['#246852', '#2e8668', '#38a47e', '#42c294'], 'spot' => 'rgba(66,194,148,0.15)'],
+                ['bg' => '#143c30', 'accents' => ['#1d5744', '#267258', '#2f8d6c', '#38a880'], 'spot' => 'rgba(56,168,128,0.15)'],
+                ['bg' => '#0f2f26', 'accents' => ['#174938', '#1f634a', '#277d5c', '#2f976e'], 'spot' => 'rgba(47,151,110,0.15)']
+            ]
         ]],
         'summer' => [[6,7,8], [
-            ['bg' => '#25a7d7', 'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'], 'spot' => 'rgba(119,218,255,0.2)'],
-            ['bg' => '#1E95C4', 'accents' => ['#0D5EAF', '#09F', '#66D1FF', '#1E88E5'], 'spot' => 'rgba(102,209,255,0.2)'],
-            ['bg' => '#1C83B0', 'accents' => ['#0C509A', '#08E', '#55C8FF', '#1976D2'], 'spot' => 'rgba(85,200,255,0.2)']
+            'day' => [
+                ['bg' => '#25a7d7', 'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'], 'spot' => 'rgba(119,218,255,0.2)'],
+                ['bg' => '#1E95C4', 'accents' => ['#0D5EAF', '#09F', '#66D1FF', '#1E88E5'], 'spot' => 'rgba(102,209,255,0.2)'],
+                ['bg' => '#1C83B0', 'accents' => ['#0C509A', '#08E', '#55C8FF', '#1976D2'], 'spot' => 'rgba(85,200,255,0.2)']
+            ],
+            'night' => [
+                ['bg' => '#0a3b4d', 'accents' => ['#0e4d64', '#125f7b', '#167192', '#1a83a9'], 'spot' => 'rgba(26,131,169,0.15)'],
+                ['bg' => '#082e3d', 'accents' => ['#0b3e52', '#0e4e67', '#115e7c', '#146e91'], 'spot' => 'rgba(20,110,145,0.15)'],
+                ['bg' => '#06222d', 'accents' => ['#082f3d', '#0a3c4d', '#0c495d', '#0e566d'], 'spot' => 'rgba(14,86,109,0.15)']
+            ]
         ]],
         'autumn' => [[9,10,11], [
-            ['bg' => '#c45d3c', 'accents' => ['#e67e51', '#ff9b6a', '#ffb38a', '#ffd0b5'], 'spot' => 'rgba(255,179,138,0.2)'],
-            ['bg' => '#B54E2F', 'accents' => ['#D96B40', '#F58755', '#FFAA82', '#FFC7AD'], 'spot' => 'rgba(255,170,130,0.2)'],
-            ['bg' => '#A64428', 'accents' => ['#CC5835', '#EB7644', '#FF9D75', '#FFBEA0'], 'spot' => 'rgba(255,157,117,0.2)']
+            'day' => [
+                ['bg' => '#c45d3c', 'accents' => ['#e67e51', '#ff9b6a', '#ffb38a', '#ffd0b5'], 'spot' => 'rgba(255,179,138,0.2)'],
+                ['bg' => '#B54E2F', 'accents' => ['#D96B40', '#F58755', '#FFAA82', '#FFC7AD'], 'spot' => 'rgba(255,170,130,0.2)'],
+                ['bg' => '#A64428', 'accents' => ['#CC5835', '#EB7644', '#FF9D75', '#FFBEA0'], 'spot' => 'rgba(255,157,117,0.2)']
+            ],
+            'night' => [
+                ['bg' => '#4d251a', 'accents' => ['#662f21', '#7f3928', '#99432f', '#b24d36'], 'spot' => 'rgba(178,77,54,0.15)'],
+                ['bg' => '#3d1d14', 'accents' => ['#52261a', '#672f20', '#7c3826', '#91412c'], 'spot' => 'rgba(145,65,44,0.15)'],
+                ['bg' => '#2d1510', 'accents' => ['#3d1c15', '#4d231a', '#5d2a1f', '#6d3124'], 'spot' => 'rgba(109,49,36,0.15)']
+            ]
         ]]
     ];
 
@@ -62,8 +90,10 @@ class TimeBasedTheme {
     public function getCurrentSeason() {
         foreach ($this->seasons as $season => $data) {
             if (in_array($this->month, $data[0])) {
-                // Wähle zufällig eine Farbpalette aus dem Array
-                $randomPalette = $data[1][array_rand($data[1])];
+                $timeOfDay = $this->isNight() ? 'night' : 'day';
+                // Wähle zufällig eine Farbpalette aus dem entsprechenden Tag/Nacht-Array
+                $palettes = $data[1][$timeOfDay];
+                $randomPalette = $palettes[array_rand($palettes)];
                 return ['name' => $season, 'theme' => $randomPalette];
             }
         }
@@ -471,7 +501,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start der Spot-Animation
     animate();
 });</script>
-
 
 <footer class="rex-global-footer">
   <nav class="rex-nav-footer">
