@@ -3,102 +3,108 @@
  * @var rex_fragment $this
  * @psalm-scope-this rex_fragment
  */
+
+$colors = [
+    [
+        'bg' => '#25a7d7',
+        'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF']
+    ],
+    [
+        'bg' => '#0e6cc4',
+        'accents' => ['#25a7d7', '#77daff', '#0af', '#1e88e5']
+    ],
+    [
+        'bg' => '#1e88e5',
+        'accents' => ['#2962FF', '#0e6cc4', '#25a7d7', '#77daff']
+    ]
+];
+
+$scheme = $colors[array_rand($colors)];
 ?>
 
-<div class="animated-bg">
-    <div class="shapes">
-        <div class="shape shape1"></div>
-        <div class="shape shape2"></div>
-        <div class="shape shape3"></div>
-        <div class="shape shape4"></div>
-        <div class="light-spot"></div>
-    </div>
+<div class="box rex-background">
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+    <div class="shape shape4"></div>
+    <div class="light-spot"></div>
 </div>
 
 <style>
 :root {
-    --bg-primary: #0f172a;
-    --accent1: #3b82f6;
-    --accent2: #06b6d4;
-    --accent3: #6366f1;
-    --accent4: #8b5cf6;
+    --bg-primary: <?= $scheme['bg'] ?>;
+    --accent1: <?= $scheme['accents'][0] ?>;
+    --accent2: <?= $scheme['accents'][1] ?>;
+    --accent3: <?= $scheme['accents'][2] ?>;
+    --accent4: <?= $scheme['accents'][3] ?>;
 }
 
-.animated-bg {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
+body {
+    margin: 0;
+    padding: 0;
     background: var(--bg-primary);
     overflow: hidden;
 }
 
-.shapes {
-    width: 100%;
-    height: 100%;
+.box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .shape {
-    position: absolute;
-    width: 120vw;
-    height: 120vh;
-    opacity: 0.5;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.3;
+    top: 0;
+    left: 0;
+    transform-origin: center;
+    z-index: -1;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 .shape1 {
-    top: 10%;
-    left: 15%;
     background: var(--accent1);
-    animation: float1 20s infinite ease-in-out;
+    animation: float 30s infinite ease-in-out;
 }
 
 .shape2 {
-    bottom: 20%;
-    right: 15%;
     background: var(--accent2);
-    animation: float2 25s infinite ease-in-out;
+    animation: float 35s infinite ease-in-out reverse;
 }
 
 .shape3 {
-    bottom: 15%;
-    left: 20%;
     background: var(--accent3);
-    animation: float3 30s infinite ease-in-out;
+    animation: float 40s infinite ease-in-out;
+    animation-delay: -10s;
 }
 
 .shape4 {
-    top: 20%;
-    right: 20%;
     background: var(--accent4);
-    animation: float4 22s infinite ease-in-out;
+    animation: float 45s infinite ease-in-out reverse;
+    animation-delay: -20s;
 }
 
 .light-spot {
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+    position: fixed;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(119,218,255,0.1) 50%, rgba(255,255,255,0) 70%);
     pointer-events: none;
-    mix-blend-mode: overlay;
+    mix-blend-mode: screen;
+    z-index: 1;
 }
 
-@keyframes float1 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    50% { transform: translate(20vw, 10vh) rotate(180deg); }
-}
-
-@keyframes float2 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    50% { transform: translate(-20vw, -10vh) rotate(-180deg); }
-}
-
-@keyframes float3 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    50% { transform: translate(10vw, -20vh) rotate(180deg); }
-}
-
-@keyframes float4 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    50% { transform: translate(-10vw, 20vh) rotate(-180deg); }
+@keyframes float {
+    0%, 100% { transform: rotate(0deg) translate(0, 0); }
+    25% { transform: rotate(90deg) translate(20vw, 20vh); }
+    50% { transform: rotate(180deg) translate(-20vw, -10vh); }
+    75% { transform: rotate(270deg) translate(-10vw, 15vh); }
 }
 </style>
 
