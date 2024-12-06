@@ -4,12 +4,86 @@
  * @psalm-scope-this rex_fragment
  */
 
-$colors = [
-    ['bg' => '#1a3c64', 'accents' => ['#2f5d8c', '#4682b4', '#b0c4de', '#e3f2fd'], 'spot' => 'rgba(224,255,255,0.2)'],
-    ['bg' => '#2c3e50', 'accents' => ['#34495e', '#5d8aa8', '#87ceeb', '#b0e0e6'], 'spot' => 'rgba(176,224,230,0.2)'],
-];
+class TimeBasedTheme {
+    private $month;
+    private $hour;
+    
+    private $seasons = [
+        'winter' => [[12,1,2], [
+            'bg' => '#1a3c64',
+            'accents' => ['#2f5d8c', '#4682b4', '#b0c4de', '#e3f2fd'],
+            'spot' => 'rgba(224,255,255,0.2)'
+        ]],
+        'spring' => [[3,4,5], [
+            'bg' => '#2d8a6d',
+            'accents' => ['#43c59e', '#3dd8a8', '#98ecb3', '#d1ffe3'],
+            'spot' => 'rgba(209,255,227,0.2)'
+        ]],
+        'summer' => [[6,7,8], [
+            'bg' => '#25a7d7',
+            'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'],
+            'spot' => 'rgba(119,218,255,0.2)'
+        ]],
+        'autumn' => [[9,10,11], [
+            'bg' => '#c45d3c',
+            'accents' => ['#e67e51', '#ff9b6a', '#ffb38a', '#ffd0b5'],
+            'spot' => 'rgba(255,179,138,0.2)'
+        ]]
+    ];
 
-$scheme = $colors[array_rand($colors)];
+    private $dayTimes = [
+        'dawn' => [[5,6,7,8], [
+            'opacity' => 0.4,
+            'blur' => '15px',
+            'spotIntensity' => 0.3
+        ]],
+        'day' => [[9,10,11,12,13,14,15], [
+            'opacity' => 0.3,
+            'blur' => '20px',
+            'spotIntensity' => 0.2
+        ]],
+        'dusk' => [[16,17,18,19], [
+            'opacity' => 0.5,
+            'blur' => '25px',
+            'spotIntensity' => 0.4
+        ]],
+        'night' => [[20,21,22,23,0,1,2,3,4], [
+            'opacity' => 0.6,
+            'blur' => '30px',
+            'spotIntensity' => 0.5
+        ]]
+    ];
+
+    public function __construct() {
+        $this->month = (int)date('n');
+        $this->hour = (int)date('G');
+    }
+
+    public function getCurrentSeason() {
+        foreach ($this->seasons as $season => $data) {
+            if (in_array($this->month, $data[0])) {
+                return ['name' => $season, 'theme' => $data[1]];
+            }
+        }
+    }
+
+    public function getDayTime() {
+        foreach ($this->dayTimes as $time => $data) {
+            if (in_array($this->hour, $data[0])) {
+                return ['name' => $time, 'settings' => $data[1]];
+            }
+        }
+    }
+
+    public function shouldSnow() {
+        return $this->getCurrentSeason()['name'] === 'winter';
+    }
+}
+
+$theme = new TimeBasedTheme();
+$currentSeason = $theme->getCurrentSeason();
+$currentTime = $theme->getDayTime();
+$showSnow = $theme->shouldSnow();
 
 $sizes = [];
 for ($i = 1; $i <= 4; $i++) {
@@ -36,7 +110,7 @@ function generateSnowflakes($count) {
     return $snowflakes;
 }
 
-$snowflakes = generateSnowflakes(50);
+$snowflakes = $showSnow ? generateSnowflakes(50) : [];
 ?>
 
 <div class="box rex-background">
@@ -47,9 +121,13 @@ $snowflakes = generateSnowflakes(50);
             top: <?= $sizes[$i]['top'] ?>;
             left: <?= $sizes[$i]['left'] ?>;
             transform: rotate(<?= $sizes[$i]['rotation'] ?>deg) scale(<?= $sizes[$i]['scale'] ?>);
+            opacity: <?= $currentTime['settings']['opacity'] ?>;
+            backdrop-filter: blur(<?= $currentTime['settings']['blur'] ?>);
+            -webkit-backdrop-filter: blur(<?= $currentTime['settings']['blur'] ?>);
         "></div>
     <?php endfor; ?>
     
+    <?php if ($showSnow): ?>
     <div class="snow-container">
         <?php foreach ($snowflakes as $flake): ?>
         <div class="snowflake" style="
@@ -61,6 +139,7 @@ $snowflakes = generateSnowflakes(50);
         "></div>
         <?php endforeach; ?>
     </div>
+    <?php endif; ?>
     
     <div class="light-spot"></div>
     <div class="glow glow1"></div>
@@ -69,12 +148,13 @@ $snowflakes = generateSnowflakes(50);
 
 <style>
 :root {
-    --bg-primary: <?= $scheme['bg'] ?>;
-    --accent1: <?= $scheme['accents'][0] ?>;
-    --accent2: <?= $scheme['accents'][1] ?>;
-    --accent3: <?= $scheme['accents'][2] ?>;
-    --accent4: <?= $scheme['accents'][3] ?>;
-    --spot-color: <?= $scheme['spot'] ?>;
+    --bg-primary: <?= $currentSeason['theme']['bg'] ?>;
+    --accent1: <?= $currentSeason['theme']['accents'][0] ?>;
+    --accent2: <?= $currentSeason['theme']['accents'][1] ?>;
+    --accent3: <?= $currentSeason['theme']['accents'][2] ?>;
+    --accent4: <?= $currentSeason['theme']['accents'][3] ?>;
+    --spot-color: <?= $currentSeason['theme']['spot'] ?>;
+    --spot-intensity: <?= $currentTime['settings']['spotIntensity'] ?>;
 }
 
 body {
@@ -95,12 +175,9 @@ body {
 
 .shape {
     position: fixed;
-    opacity: 0.3;
     transform-origin: center;
     z-index: -1;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: transform 0.5s ease-out;
+    transition: all 0.5s ease-out;
 }
 
 .shape1 {
@@ -147,7 +224,12 @@ body {
     position: fixed;
     width: 800px;
     height: 800px;
-    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, var(--spot-color) 50%, rgba(255,255,255,0) 70%);
+    background: radial-gradient(
+        circle, 
+        rgba(255,255,255,calc(0.2 * var(--spot-intensity))) 0%, 
+        var(--spot-color) 50%, 
+        rgba(255,255,255,0) 70%
+    );
     pointer-events: none;
     mix-blend-mode: screen;
     z-index: 1;
@@ -158,10 +240,14 @@ body {
     position: fixed;
     width: 150vw;
     height: 150vh;
-    background: radial-gradient(circle, var(--spot-color) 0%, rgba(255,255,255,0) 70%);
+    background: radial-gradient(
+        circle, 
+        var(--spot-color) 0%, 
+        rgba(255,255,255,0) 70%
+    );
     pointer-events: none;
     mix-blend-mode: screen;
-    opacity: 0.4;
+    opacity: calc(0.4 * var(--spot-intensity));
     animation: pulse 8s infinite ease-in-out;
     filter: blur(5px);
 }
@@ -207,8 +293,8 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.1); }
+    0%, 100% { opacity: calc(0.4 * var(--spot-intensity)); transform: scale(1); }
+    50% { opacity: calc(0.6 * var(--spot-intensity)); transform: scale(1.1); }
 }
 </style>
 
