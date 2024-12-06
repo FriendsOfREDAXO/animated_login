@@ -91,7 +91,6 @@ class TimeBasedTheme {
         foreach ($this->seasons as $season => $data) {
             if (in_array($this->month, $data[0])) {
                 $timeOfDay = $this->isNight() ? 'night' : 'day';
-                // Wähle zufällig eine Farbpalette aus dem entsprechenden Tag/Nacht-Array
                 $palettes = $data[1][$timeOfDay];
                 $randomPalette = $palettes[array_rand($palettes)];
                 return ['name' => $season, 'theme' => $randomPalette];
@@ -122,7 +121,7 @@ $currentTime = $theme->getDayTime();
 $showSnow = $theme->shouldSnow();
 $isNight = $theme->isNight();
 
-// Hintergrund-Formen generieren
+// Generate background shapes
 $sizes = [];
 for ($i = 1; $i <= 4; $i++) {
     $sizes[] = [
@@ -135,17 +134,17 @@ for ($i = 1; $i <= 4; $i++) {
     ];
 }
 
-// Schneeflocken generieren
+// Generate snowflakes
 function generateSnowflakes($count) {
     $snowflakes = [];
     for ($i = 0; $i < $count; $i++) {
         $snowflakes[] = [
-            'size' => rand(3, 8) / 2, // Feinere Größenabstufung zwischen 1.5 und 4px
+            'size' => rand(3, 8) / 2,
             'left' => rand(-20, 120),
             'opacity' => (rand(60, 90) / 100),
             'delay' => (rand(0, 500) / 100),
             'duration' => rand(8, 20),
-            'sway' => rand(10, 50) / 10 // Schwankungsstärke
+            'sway' => rand(10, 50) / 10
         ];
     }
     return $snowflakes;
@@ -184,7 +183,6 @@ $snowflakes = $showSnow ? generateSnowflakes(150) : [];
             --sway: <?= $flake['sway'] ?>px;
         "></div>
         <?php endforeach; ?>
-        <div class="snow-ground"></div>
     </div>
     <?php endif; ?>
 
@@ -234,7 +232,7 @@ body {
 .shape3 { background: var(--accent3); animation: float 90s infinite ease-in-out; animation-delay: -30s; }
 .shape4 { background: var(--accent4); animation: float 85s infinite ease-in-out reverse; animation-delay: -45s; }
 
-/* Schnee-Container und Ebenen */
+/* Snow container and layers */
 .snow-container {
     position: fixed;
     width: 100vw;
@@ -280,7 +278,7 @@ body {
     transform: translateZ(0) scale(1);
 }
 
-/* Einzelne Schneeflocken */
+/* Individual snowflakes */
 .snowflake {
     position: absolute;
     background: var(--snow-color);
@@ -291,42 +289,7 @@ body {
     will-change: transform;
 }
 
-/* Akkumulierter Schnee am Boden */
-.snow-pile {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 0;
-    pointer-events: none;
-    z-index: 3;
-}
-
-.landed-snowflake {
-    position: absolute;
-    background: var(--snow-color);
-    border-radius: 50%;
-    box-shadow: 0 2px 5px var(--snow-shadow);
-    transform-origin: center bottom;
-    animation: settle 0.5s ease-out forwards;
-}
-
-@keyframes settle {
-    0% {
-        transform: scale(1) translateY(-10px);
-        opacity: 0.8;
-    }
-    50% {
-        transform: scale(1.2) translateY(2px);
-        opacity: 0.9;
-    }
-    100% {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Lichteffekte */
+/* Light effects */
 .light-spot {
     position: fixed;
     width: 800px;
@@ -360,7 +323,7 @@ body {
 .glow1 { top: -25vh; left: -25vw; animation-delay: -4s; }
 .glow2 { bottom: -25vh; right: -25vw; }
 
-/* Animationen */
+/* Animations */
 @keyframes float {
     0%, 100% { transform: rotate(<?= rand(-45, 45) ?>deg) translate(0, 0) scale(1); }
     25% { transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(5, 15) ?>vw, <?= rand(5, 15) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); }
@@ -374,26 +337,11 @@ body {
 }
 
 @keyframes snowfall {
-    0% {
-        transform: translateY(-10vh) translateX(calc(var(--sway) * -1));
-    }
-    25% {
-        transform: translateY(25vh) translateX(var(--sway));
-    }
-    50% {
-        transform: translateY(50vh) translateX(calc(var(--sway) * -0.5));
-    }
-    75% {
-        transform: translateY(75vh) translateX(var(--sway));
-    }
-    100% {
-        transform: translateY(110vh) translateX(calc(var(--sway) * -1));
-    }
-}
-
-@keyframes snow-accumulate {
-    from { transform: scaleY(0); }
-    to { transform: scaleY(1); }
+    0% { transform: translateY(-10vh) translateX(calc(var(--sway) * -1)); }
+    25% { transform: translateY(25vh) translateX(var(--sway)); }
+    50% { transform: translateY(50vh) translateX(calc(var(--sway) * -0.5)); }
+    75% { transform: translateY(75vh) translateX(var(--sway)); }
+    100% { transform: translateY(110vh) translateX(calc(var(--sway) * -1)); }
 }
 
 @keyframes pulse {
@@ -404,7 +352,7 @@ body {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Spot-Animation
+    // Light spot animation
     const spot = document.querySelector('.light-spot');
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
@@ -425,100 +373,10 @@ document.addEventListener('DOMContentLoaded', () => {
         mouseY = e.clientY;
     });
 
-    // Schneefall-Optimierung
-    if (document.querySelector('.snow-container')) {
-        const snowContainer = document.querySelector('.snow-container');
-        let snowHeight = 0;
-        const maxSnowHeight = 50; // Maximale Schneehöhe in Pixeln
-        
-        // Schneehöhen für verschiedene Bereiche
-        const snowHeights = new Array(20).fill(0);
-        const sections = document.querySelectorAll('.rex-page-section');
-        
-        // Schneeflocken beobachten
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const snowflake = entry.target;
-                if (!entry.isIntersecting && entry.boundingClientRect.y > window.innerHeight) {
-                    // Schneeflocke hat den unteren Bildschirmrand erreicht
-                    const xPos = parseInt(snowflake.style.left);
-                    const sectionIndex = Math.floor((xPos / window.innerWidth) * snowHeights.length);
-                    
-                    if (sectionIndex >= 0 && sectionIndex < snowHeights.length) {
-                        // Schnee akkumulieren
-                        if (snowHeights[sectionIndex] < maxSnowHeight) {
-                            snowHeights[sectionIndex] += 0.5;
-                            updateSnowGround();
-                        }
-                    }
-                    
-                    // Schneeflocke zurücksetzen
-                    resetSnowflake(snowflake);
-                }
-            });
-        }, {
-            threshold: 0,
-            rootMargin: '0px 0px -20px 0px'
-        });
-
-        // Schneeflocken zurücksetzen
-        function resetSnowflake(snowflake) {
-            const startLeft = Math.random() * 120 - 20; // -20 bis 100
-            snowflake.style.left = `${startLeft}%`;
-            snowflake.style.top = '-5vh';
-            
-            // Animation neu starten
-            snowflake.style.animation = 'none';
-            snowflake.offsetHeight; // Force reflow
-            snowflake.style.animation = null;
-        }
-
-        // Schneeboden aktualisieren
-        function updateSnowGround() {
-            const ground = document.querySelector('.snow-ground');
-            if (ground) {
-                const maxHeight = Math.max(...snowHeights);
-                ground.style.height = `${maxHeight}px`;
-                
-                // Wellenförmige Oberfläche erzeugen
-                let gradient = 'linear-gradient(180deg, transparent 0%, var(--snow-color) 100%)';
-                if (maxHeight > 5) {
-                    const steps = snowHeights.map((height, i) => {
-                        const percent = (height / maxHeight) * 100;
-                        return `${(i / snowHeights.length) * 100}% ${100 - percent}%`;
-                    }).join(', ');
-                    gradient = `linear-gradient(180deg, transparent ${steps}, var(--snow-color) 100%)`;
-                }
-                ground.style.maskImage = gradient;
-                ground.style.webkitMaskImage = gradient;
-            }
-        }
-
-        // Initiale Schneeflocken beobachten
-        document.querySelectorAll('.snowflake').forEach(snowflake => {
-            observer.observe(snowflake);
-        });
-
-        // Periodisch neue Schneeflocken erzeugen
-        setInterval(() => {
-            const snowflakes = document.querySelectorAll('.snowflake');
-            snowflakes.forEach(snowflake => {
-                if (!snowflake.isObserved) {
-                    observer.observe(snowflake);
-                    snowflake.isObserved = true;
-                }
-            });
-        }, 1000);
-
-        // Performance-Optimierung
-        document.querySelectorAll('.snowflake').forEach(snowflake => {
-            snowflake.style.willChange = 'transform';
-        });
-    }
-
-    // Start der Spot-Animation
+    // Start spot animation
     animate();
-});</script>
+});
+</script>
 
 <footer class="rex-global-footer">
   <nav class="rex-nav-footer">
