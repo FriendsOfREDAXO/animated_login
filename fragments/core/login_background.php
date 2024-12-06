@@ -150,6 +150,48 @@ body {
     z-index: 2;
 }
 
+.individual-snowflake {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.accumulated-snow {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+    transition: height 0.3s ease-out;
+    border-radius: 3px 3px 0 0;
+    z-index: 3;
+}
+
+.sliding-snow {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    animation: slide-down 1s ease-in forwards;
+    z-index: 2;
+}
+
+@keyframes slide-down {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(100px) translateX(50px);
+        opacity: 0;
+    }
+}
+
 .snowfall::before, .snowfall::after {
     content: '';
     position: fixed;
@@ -279,12 +321,106 @@ body {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Spot animation
     const spot = document.querySelector('.light-spot');
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let currentX = mouseX;
     let currentY = mouseY;
 
+    // Schnee-Akkumulation Setup
+    const sections = document.querySelectorAll('.rex-page-section');
+    const snowLayers = new Map();
+    const maxSnowHeight = 30; // Maximale Schneehöhe in Pixeln
+    const snowSlideThreshold = 25; // Ab dieser Höhe beginnt der Schnee abzurutschen
+
+    // Erstelle für jede Section einen Schnee-Layer
+    sections.forEach(section => {
+        const snowLayer = document.createElement('div');
+        snowLayer.className = 'accumulated-snow';
+        section.style.position = 'relative';
+        section.appendChild(snowLayer);
+        snowLayers.set(section, {
+            element: snowLayer,
+            height: 0,
+            snow: []
+        });
+    });
+
+    // Schneeflocken erstellen und fallen lassen
+    function createSnowflake() {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'individual-snowflake';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.querySelector('.snowfall').appendChild(snowflake);
+
+        // Verfolge die Position der Schneeflocke
+        let currentY = -10;
+        let falling = true;
+
+        function updateSnowflake() {
+            if (!falling) return;
+
+            currentY += 1;
+            snowflake.style.top = currentY + 'px';
+
+            // Prüfe Kollision mit Sections
+            sections.forEach(section => {
+                const sectionRect = section.getBoundingClientRect();
+                const snowflakeRect = snowflake.getBoundingClientRect();
+
+                if (falling &&
+                    snowflakeRect.bottom >= sectionRect.top &&
+                    snowflakeRect.top <= sectionRect.bottom &&
+                    snowflakeRect.left >= sectionRect.left &&
+                    snowflakeRect.right <= sectionRect.right) {
+                    
+                    falling = false;
+                    snowflake.remove();
+
+                    // Akkumuliere Schnee
+                    const layerData = snowLayers.get(section);
+                    layerData.height = Math.min(layerData.height + 0.5, maxSnowHeight);
+                    layerData.element.style.height = layerData.height + 'px';
+
+                    // Prüfe ob Schnee abrutschen soll
+                    if (layerData.height >= snowSlideThreshold) {
+                        slideSnow(section, layerData);
+                    }
+                }
+            });
+
+            if (falling && currentY < window.innerHeight) {
+                requestAnimationFrame(updateSnowflake);
+            } else if (falling) {
+                snowflake.remove();
+            }
+        }
+
+        requestAnimationFrame(updateSnowflake);
+    }
+
+    // Schnee abrutschen lassen
+    function slideSnow(section, layerData) {
+        const slideAmount = Math.random() * 5 + 5;
+        layerData.height = Math.max(0, layerData.height - slideAmount);
+        layerData.element.style.height = layerData.height + 'px';
+
+        // Visueller Effekt für das Abrutschen
+        const slidingSnow = document.createElement('div');
+        slidingSnow.className = 'sliding-snow';
+        section.appendChild(slidingSnow);
+
+        setTimeout(() => {
+            slidingSnow.remove();
+        }, 1000);
+    }
+
+    // Schneeflocken periodisch erstellen
+    setInterval(createSnowflake, 100);
+
+    // Spot animation
     const animate = () => {
         currentX += (mouseX - currentX) * 0.05;
         currentY += (mouseY - currentY) * 0.05;
