@@ -5,9 +5,8 @@
  */
 
 $colors = [
-    ['bg' => '#25a7d7', 'accents' => ['#0e6cc4', '#0af', '#77daff', '#2962FF'], 'spot' => 'rgba(119,218,255,0.1)'],
-    ['bg' => '#0e6cc4', 'accents' => ['#25a7d7', '#39d353', '#0af', '#1e88e5'], 'spot' => 'rgba(57,211,83,0.1)'],
-    ['bg' => '#1e88e5', 'accents' => ['#2962FF', '#2ea043', '#25a7d7', '#77daff'], 'spot' => 'rgba(46,160,67,0.1)']
+    ['bg' => '#1a3c64', 'accents' => ['#2f5d8c', '#4682b4', '#b0c4de', '#e3f2fd'], 'spot' => 'rgba(224,255,255,0.2)'],
+    ['bg' => '#2c3e50', 'accents' => ['#34495e', '#5d8aa8', '#87ceeb', '#b0e0e6'], 'spot' => 'rgba(176,224,230,0.2)'],
 ];
 
 $scheme = $colors[array_rand($colors)];
@@ -23,6 +22,21 @@ for ($i = 1; $i <= 4; $i++) {
         'scale' => (rand(80, 120) / 100)
     ];
 }
+
+function generateSnowflakes($count) {
+    $snowflakes = [];
+    for ($i = 0; $i < $count; $i++) {
+        $snowflakes[] = [
+            'left' => rand(0, 100),
+            'size' => rand(2, 6),
+            'delay' => rand(0, 15),
+            'duration' => rand(10, 20)
+        ];
+    }
+    return $snowflakes;
+}
+
+$snowflakes = generateSnowflakes(50);
 ?>
 
 <div class="box rex-background">
@@ -35,6 +49,19 @@ for ($i = 1; $i <= 4; $i++) {
             transform: rotate(<?= $sizes[$i]['rotation'] ?>deg) scale(<?= $sizes[$i]['scale'] ?>);
         "></div>
     <?php endfor; ?>
+    
+    <div class="snow-container">
+        <?php foreach ($snowflakes as $flake): ?>
+        <div class="snowflake" style="
+            left: <?= $flake['left'] ?>%;
+            width: <?= $flake['size'] ?>px;
+            height: <?= $flake['size'] ?>px;
+            animation-delay: -<?= $flake['delay'] ?>s;
+            animation-duration: <?= $flake['duration'] ?>s;
+        "></div>
+        <?php endforeach; ?>
+    </div>
+    
     <div class="light-spot"></div>
     <div class="glow glow1"></div>
     <div class="glow glow2"></div>
@@ -98,6 +125,24 @@ body {
     animation-delay: -45s;
 }
 
+.snow-container {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.snowflake {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: snowfall linear infinite;
+}
+
 .light-spot {
     position: fixed;
     width: 800px;
@@ -106,6 +151,7 @@ body {
     pointer-events: none;
     mix-blend-mode: screen;
     z-index: 1;
+    filter: blur(3px);
 }
 
 .glow {
@@ -117,6 +163,7 @@ body {
     mix-blend-mode: screen;
     opacity: 0.4;
     animation: pulse 8s infinite ease-in-out;
+    filter: blur(5px);
 }
 
 .glow1 {
@@ -142,6 +189,20 @@ body {
     }
     75% { 
         transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(-10, -5) ?>vw, <?= rand(5, 10) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
+}
+
+@keyframes snowfall {
+    0% {
+        transform: translateY(-10vh) translateX(-20px);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(110vh) translateX(20px);
+        opacity: 0.2;
     }
 }
 
