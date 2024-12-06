@@ -96,7 +96,6 @@ body {
     overflow: hidden;
 }
 
-/* Bestehende Styles für shapes, etc. */
 .shape {
     position: fixed;
     opacity: 0.3;
@@ -104,43 +103,9 @@ body {
     z-index: -1;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    transition: all 0.5s ease-out;
+    transition: transform 0.5s ease-out;
 }
 
-/* Schneeflocken-Animation */
-.snowfall {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 1000;
-    background-image: 
-        radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 50px 160px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 160px 120px, #fff, rgba(0,0,0,0));
-    background-repeat: repeat;
-    animation: snowfall 10s linear infinite;
-}
-
-@keyframes snowfall {
-    0% { background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px; }
-    100% { 
-        background-position: 
-            500px 1000px, 
-            400px 900px, 
-            300px 800px, 
-            200px 700px,
-            100px 600px,
-            0px 500px; 
-    }
-}
-
-/* Bestehende Animationen und weitere Styles bleiben gleich */
 .shape1 {
     background: var(--accent1);
     animation: float 60s infinite ease-in-out;
@@ -161,6 +126,52 @@ body {
     background: var(--accent4);
     animation: float 85s infinite ease-in-out reverse;
     animation-delay: -45s;
+}
+
+.snowfall {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.snowfall::before,
+.snowfall::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(4px 4px at 100px 50px, #fff, transparent),
+        radial-gradient(6px 6px at 200px 150px, #fff, transparent),
+        radial-gradient(3px 3px at 300px 250px, #fff, transparent),
+        radial-gradient(4px 4px at 400px 350px, #fff, transparent),
+        radial-gradient(6px 6px at 500px 100px, #fff, transparent),
+        radial-gradient(3px 3px at 50px 200px, #fff, transparent),
+        radial-gradient(4px 4px at 150px 300px, #fff, transparent),
+        radial-gradient(6px 6px at 250px 400px, #fff, transparent),
+        radial-gradient(3px 3px at 350px 500px, #fff, transparent);
+    background-size: 650px 650px;
+    animation: snow 3s linear infinite;
+}
+
+.snowfall::after {
+    margin-left: -250px;
+    opacity: 0.5;
+    animation: snow 6s linear infinite;
+    animation-delay: -3s;
+}
+
+@keyframes snow {
+    0% {
+        transform: translate3d(0, -650px, 0);
+    }
+    100% {
+        transform: translate3d(0, 650px, 0);
+    }
 }
 
 .light-spot {
@@ -184,21 +195,84 @@ body {
     animation: pulse 8s infinite ease-in-out;
 }
 
-/* Rest der bestehenden Styles... */
+.glow1 {
+    top: -25vh;
+    left: -25vw;
+    animation-delay: -4s;
+}
+
+.glow2 {
+    bottom: -25vh;
+    right: -25vw;
+}
+
+@keyframes float {
+    0%, 100% { 
+        transform: rotate(<?= rand(-45, 45) ?>deg) translate(0, 0) scale(1); 
+    }
+    25% { 
+        transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(5, 15) ?>vw, <?= rand(5, 15) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
+    50% { 
+        transform: rotate(<?= rand(75, 105) ?>deg) translate(<?= rand(-15, -5) ?>vw, <?= rand(-10, -5) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
+    75% { 
+        transform: rotate(<?= rand(30, 60) ?>deg) translate(<?= rand(-10, -5) ?>vw, <?= rand(5, 10) ?>vh) scale(<?= (rand(90, 110) / 100) ?>); 
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: <?= $isNight ? '0.3' : '0.4' ?>; transform: scale(1); }
+    50% { opacity: <?= $isNight ? '0.4' : '0.6' ?>; transform: scale(1.1); }
+}
+
+/* Footer Styles */
+.rex-global-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 1rem;
+    z-index: 1000;
+}
+
+.rex-nav-footer .list-inline {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+}
+
+.rex-nav-footer .list-inline li {
+    display: inline-block;
+    margin: 0 1rem;
+}
+
+.rex-nav-footer a {
+    color: #fff;
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.rex-nav-footer a:hover {
+    opacity: 1;
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const spot = document.querySelector('.light-spot');
-    let mouseX = 0;
-    let mouseY = 0;
-    let currentX = 0;
-    let currentY = 0;
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let currentX = mouseX;
+    let currentY = mouseY;
 
     const animate = () => {
         currentX += (mouseX - currentX) * 0.05;
         currentY += (mouseY - currentY) * 0.05;
-        spot.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%, -50%)`;
+        if (spot) {
+            spot.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%, -50%)`;
+        }
         requestAnimationFrame(animate);
     };
 
