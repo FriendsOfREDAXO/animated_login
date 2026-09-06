@@ -289,6 +289,30 @@ $seasonName = $currentSeason['name'];
 $timeName = $currentTime['name'];
 $isLateSummer = $seasonName === 'summer' && $theme->isLateSummer();
 
+/**
+ * Perceived brightness (0-255) of a hex color, for deciding readable text color.
+ */
+function relativeLuminance(string $hex): float
+{
+    $hex = ltrim($hex, '#');
+    if (3 === strlen($hex)) {
+        $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+    }
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+    return 0.299 * $r + 0.587 * $g + 0.114 * $b;
+}
+
+// The login panel is a frosted-glass overlay, so the season's own colors show
+// through it - a fixed white label color (fine on dark seasons) becomes unreadable
+// on light ones (spring meadows, summer sky, golden late summer). Pick light or
+// dark label text per render based on how bright this palette actually is, instead
+// of assuming the background is always dark.
+$paletteBrightnessSamples = array_merge([$currentSeason['theme']['bg']], $currentSeason['theme']['accents']);
+$paletteBrightness = array_sum(array_map('relativeLuminance', $paletteBrightnessSamples)) / count($paletteBrightnessSamples);
+$isLightPanel = $paletteBrightness > 145;
+
 // Ordered list of all 16 combinations, grouped by season, for the browse arrow to
 // step through one at a time.
 $themeCombos = [];
@@ -668,6 +692,8 @@ function cornerToCss(string $corner): string
         --tulip-cream: <?= $isNight ? 'rgba(225,222,180,0.85)' : 'rgba(250,245,210,0.97)' ?>;
         --tulip-sage: <?= $isNight ? 'rgba(150,190,120,0.85)' : 'rgba(150,195,110,0.95)' ?>;
         --firefly-color: <?= $isNight ? 'rgba(255,244,150,0.9)' : 'rgba(255,244,150,0.6)' ?>;
+        --panel-text: <?= $isLightPanel ? '#241a2e' : 'rgba(255,255,255,0.95)' ?>;
+        --panel-text-shadow: <?= $isLightPanel ? '0 1px 2px rgba(255,255,255,0.5)' : '0 1px 3px rgba(0,0,0,0.35)' ?>;
     }
 
     body {
@@ -925,8 +951,8 @@ function cornerToCss(string $corner): string
     }
 
     #rex-page-login label {
-        color: rgba(255, 255, 255, 0.95);
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+        color: var(--panel-text);
+        text-shadow: var(--panel-text-shadow);
     }
 
     /* Arrow to browse through every season/time-of-day combination */
